@@ -39,7 +39,10 @@ var JsonRPC    = RpcBuilder.packers.JsonRPC;
 var checkType   = require('./checkType');
 var checkParams = checkType.checkParams;
 
-var noop = require('./utils').noop;
+var utils = require('./utils');
+
+var noop            = utils.noop;
+var promiseCallback = utils.promiseCallback;
 
 
 // Remote classes
@@ -405,12 +408,7 @@ function KwsMedia(uri, options, onconnect, onerror)
         describe(id, callback);
     });
 
-    if(callback)
-      promise.then(function(result)
-      {
-        callback(null, result);
-      },
-      callback);
+    promiseCallback(promise, callback);
 
     return promise;
   };
@@ -452,12 +450,7 @@ function KwsMedia(uri, options, onconnect, onerror)
         createMediaObject({params: params || {}, type: type}, callback);
     });
 
-    if(callback)
-      promise.then(function(result)
-      {
-        callback(null, result);
-      },
-      callback);
+    promiseCallback(promise, callback);
 
     return promise;
   };
@@ -511,12 +504,7 @@ KwsMedia.prototype.connect = function(media, callback)
     }, callback);
   });
 
-  if(callback)
-    promise.then(function(result)
-    {
-      callback(null, result);
-    },
-    callback);
+  promiseCallback(promise, callback);
 
   return promise;
 };
@@ -566,7 +554,10 @@ var inherits = require('inherits');
 
 var Promise = require('es6-promise').Promise;
 
-var noop = require('./utils').noop;
+var utils = require('./utils');
+
+var noop            = utils.noop;
+var promiseCallback = utils.promiseCallback;
 
 
 /**
@@ -706,12 +697,7 @@ _MediaObject.prototype.invoke = function(method, params, callback){
     });
   });
 
-  if(callback)
-    promise.then(function(result)
-    {
-      callback(null, result);
-    },
-    callback);
+  promiseCallback(promise, callback);
 
   return promise;
 };
@@ -745,12 +731,7 @@ _MediaObject.prototype.release = function(callback){
     });
   });
 
-  if(callback)
-    promise.then(function()
-    {
-      callback();
-    },
-    callback);
+  promiseCallback(promise, callback);
 
   return promise;
 };
@@ -1617,6 +1598,10 @@ Filter.check = function(key, value)
 
 var inherits = require('inherits');
 
+var Promise = require('es6-promise').Promise;
+
+var promiseCallback = require('../utils').promiseCallback;
+
 
 /**
  * Media API for the Kurento Web SDK
@@ -1671,15 +1656,7 @@ Hub.prototype.createHubPort = function(callback)
     });
   });
 
-  if(callback)
-    promise.then(function(result)
-    {
-      callback(null, result);
-    },
-    function(error)
-    {
-      callback(error);
-    });
+  promiseCallback(promise, callback);
 
   return promise;
 };
@@ -1713,7 +1690,7 @@ Hub.check = function(key, value)
     throw SyntaxError(key+' param should be a Hub, not '+typeof value);
 };
 
-},{"./MediaObject":17,"inherits":68}],15:[function(require,module,exports){
+},{"../utils":48,"./MediaObject":17,"es6-promise":57,"inherits":68}],15:[function(require,module,exports){
 /*
  * (C) Copyright 2013-2014 Kurento (http://kurento.org/)
  *
@@ -2308,6 +2285,8 @@ var inherits = require('inherits');
 
 var Promise = require('es6-promise').Promise;
 
+var promiseCallback = require('../utils').promiseCallback;
+
 
 /**
  * Media API for the Kurento Web SDK
@@ -2377,12 +2356,7 @@ MediaPipeline.prototype.create = function(type, params, callback){
     });
   });
 
-  if(callback)
-    promise.then(function(result)
-    {
-      callback(null, result);
-    },
-    callback);
+  promiseCallback(promise, callback);
 
   return promise;
 };
@@ -2416,7 +2390,7 @@ MediaPipeline.check = function(key, value)
     throw SyntaxError(key+' param should be a MediaPipeline, not '+typeof value);
 };
 
-},{"./MediaObject":17,"es6-promise":57,"inherits":68}],20:[function(require,module,exports){
+},{"../utils":48,"./MediaObject":17,"es6-promise":57,"inherits":68}],20:[function(require,module,exports){
 /*
  * (C) Copyright 2013-2014 Kurento (http://kurento.org/)
  *
@@ -5387,7 +5361,38 @@ function noop(error)
 };
 
 
-exports.noop = noop;
+/**
+ * Define a callback as the continuation of a promise
+ */
+function promiseCallback(promise, callback)
+{
+  if(callback)
+  {
+    function callback2(error, result)
+    {
+      try
+      {
+        callback(error, result);
+      }
+      catch(exception)
+      {
+        // Show the exception in the console with its full stack trace
+        console.error(exception);
+        throw exception;
+      }
+    };
+  
+    promise.then(function(result)
+    {
+      callback2(null, result);
+    },
+    callback2);
+  };
+};
+
+
+exports.noop            = noop;
+exports.promiseCallback = promiseCallback;
 
 },{}],49:[function(require,module,exports){
 (function (process){
