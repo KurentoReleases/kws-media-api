@@ -693,7 +693,10 @@ _MediaObject.prototype.invoke = function(method, params, callback){
     {
       if(error) return reject(error);
 
-      resolve(result.value);
+      var value = result.value;
+      if(value === undefined) value = self;
+
+      resolve(value);
     });
   });
 
@@ -9766,6 +9769,7 @@ RpcBuilder.RpcNotification = RpcNotification;
 
 module.exports = RpcBuilder;
 
+RpcBuilder.clients = clients;
 RpcBuilder.packers = packers;
 
 },{"./Mapper":69,"./packers":73,"events":50,"inherits":68}],71:[function(require,module,exports){
