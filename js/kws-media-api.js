@@ -532,7 +532,7 @@ KwsMedia.prototype.connect = function(media, callback)
 
 module.exports = KwsMedia;
 
-},{"./checkType":3,"./core":22,"./core/Filter":13,"./core/Hub":14,"./core/MediaElement":16,"./core/MediaObject":17,"./core/MediaPad":18,"./core/MediaSink":20,"./core/MediaSource":21,"./endpoints":33,"./endpoints/HttpEndpoint":23,"./endpoints/SdpEndpoint":29,"./endpoints/SessionEndpoint":30,"./endpoints/UriEndpoint":31,"./filters":43,"./hubs":47,"./utils":48,"async":49,"es6-promise":57,"events":50,"extend":67,"inherits":68,"kws-rpc-builder":70,"url":56,"ws":74}],2:[function(_dereq_,module,exports){
+},{"./checkType":3,"./core":22,"./core/Filter":13,"./core/Hub":14,"./core/MediaElement":16,"./core/MediaObject":17,"./core/MediaPad":18,"./core/MediaSink":20,"./core/MediaSource":21,"./endpoints":33,"./endpoints/HttpEndpoint":23,"./endpoints/SdpEndpoint":29,"./endpoints/SessionEndpoint":30,"./endpoints/UriEndpoint":31,"./filters":43,"./hubs":47,"./utils":48,"async":49,"es6-promise":57,"events":50,"extend":67,"inherits":68,"kws-rpc-builder":72,"url":56,"ws":76}],2:[function(_dereq_,module,exports){
 /*
  * (C) Copyright 2013-2014 Kurento (http://kurento.org/)
  *
@@ -9090,6 +9090,62 @@ module.exports = Mapper;
  *
  */
 
+var JsonRpcClient  = _dereq_('./jsonrpcclient');
+
+
+exports.JsonRpcClient  = JsonRpcClient;
+
+},{"./jsonrpcclient":71}],71:[function(_dereq_,module,exports){
+/*
+ * (C) Copyright 2014 Kurento (http://kurento.org/)
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
+var RpcBuilder = _dereq_('../..');
+
+var WebSocket = _dereq_('ws');
+
+
+function JsonRpcClient(wsUrl, onRequest, onerror)
+{
+  var ws = new WebSocket(wsUrl);
+      ws.addEventListener('error', onerror);
+
+  var rpc = new RpcBuilder(RpcBuilder.packers.JsonRPC, ws, onRequest);
+
+  this.close       = rpc.close.bind(rpc);
+  this.sendRequest = rpc.encode.bind(rpc);
+};
+
+
+module.exports  = JsonRpcClient;
+
+},{"../..":72,"ws":76}],72:[function(_dereq_,module,exports){
+/*
+ * (C) Copyright 2014 Kurento (http://kurento.org/)
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
 var EventEmitter = _dereq_('events').EventEmitter;
 
 var inherits = _dereq_('inherits');
@@ -9769,10 +9825,12 @@ RpcBuilder.RpcNotification = RpcNotification;
 
 module.exports = RpcBuilder;
 
+var clients = _dereq_('./clients');
+
 RpcBuilder.clients = clients;
 RpcBuilder.packers = packers;
 
-},{"./Mapper":69,"./packers":73,"events":50,"inherits":68}],71:[function(_dereq_,module,exports){
+},{"./Mapper":69,"./clients":70,"./packers":75,"events":50,"inherits":68}],73:[function(_dereq_,module,exports){
 /**
  * JsonRPC 2.0 packer
  */
@@ -9876,7 +9934,7 @@ function unpack(message)
 exports.pack   = pack;
 exports.unpack = unpack;
 
-},{}],72:[function(_dereq_,module,exports){
+},{}],74:[function(_dereq_,module,exports){
 function pack(message)
 {
   throw new TypeError("Not yet implemented");
@@ -9891,7 +9949,7 @@ function unpack(message)
 exports.pack   = pack;
 exports.unpack = unpack;
 
-},{}],73:[function(_dereq_,module,exports){
+},{}],75:[function(_dereq_,module,exports){
 var JsonRPC = _dereq_('./JsonRPC');
 var XmlRPC  = _dereq_('./XmlRPC');
 
@@ -9899,7 +9957,7 @@ var XmlRPC  = _dereq_('./XmlRPC');
 exports.JsonRPC = JsonRPC;
 exports.XmlRPC  = XmlRPC;
 
-},{"./JsonRPC":71,"./XmlRPC":72}],74:[function(_dereq_,module,exports){
+},{"./JsonRPC":73,"./XmlRPC":74}],76:[function(_dereq_,module,exports){
 
 /**
  * Module dependencies.
