@@ -11,7 +11,7 @@
     "web",
     "WebRTC"
   ],
-  "homepage": "http://www.kurento.com",
+  "homepage": "http://www.kurento.org",
   "repository": {
     "type": "git",
     "url": "https://github.com/Kurento/kws-media-api.git"
